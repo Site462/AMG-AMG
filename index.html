@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Connexion & Inscription</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+        
+        body {
+            min-height: 100vh;
+            background-image: url('https://image.noelshack.com/fichiers/2025/05/7/1738486062-palm-2-9-beachfront-hauteretreats-personnalis.jpg');
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        body::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: linear-gradient(45deg, rgba(0,0,0,0.5), rgba(0,0,0,0.2));
+            backdrop-filter: blur(2px);
+        }
+        
+        .form-container {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 40px 30px;
+            box-shadow: 0 0 40px rgba(58, 134, 255, 0.4),
+                        0 0 80px rgba(58, 134, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            animation: glow 1s infinite alternate;
+        }
+        
+        .form-container::before,
+        .form-container::after {
+            content: '';
+            position: absolute;
+            top: -3px; left: -3px;
+            width: calc(100% + 6px);
+            height: calc(100% + 6px);
+            background: linear-gradient(45deg, 
+                #ff0000, #ff8000, #ffff00, #00ff00, 
+                #00ffff, #0080ff, #0000ff, #8000ff, 
+                #ff00ff, #ff0080);
+            background-size: 1000% 1000%;
+            animation: rainbowBorder 4s linear infinite;
+            border-radius: 22px;
+            z-index: -1;
+        }
+        
+        .form-container::after {
+            filter: blur(15px);
+        }
+        
+        @keyframes rainbowBorder {
+            0% { background-position: 0% 0%; }
+            100% { background-position: 100% 100%; }
+        }
+        
+        @keyframes glow {
+            from {
+                box-shadow: 0 0 40px rgba(58, 134, 255, 0.4),
+                            0 0 80px rgba(58, 134, 255, 0.2);
+            }
+            to {
+                box-shadow: 0 0 50px rgba(58, 134, 255, 0.6),
+                            0 0 100px rgba(58, 134, 255, 0.3);
+            }
+        }
+        
+        .logo {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .logo-icon {
+            font-size: 45px;
+            color: white;
+            text-shadow: 0 0 20px rgba(255,255,255,0.8),
+                         0 0 40px rgba(58, 134, 255, 0.6);
+            animation: logoColorChange 2s infinite;
+        }
+        
+        @keyframes logoColorChange {
+            0% { color: #ff0000; text-shadow: 0 0 20px rgba(255,0,0,0.8); }
+            20% { color: #ffff00; text-shadow: 0 0 20px rgba(255,255,0,0.8); }
+            40% { color: #00ff00; text-shadow: 0 0 20px rgba(0,255,0,0.8); }
+            60% { color: #00ffff; text-shadow: 0 0 20px rgba(0,255,255,0.8); }
+            80% { color: #0000ff; text-shadow: 0 0 20px rgba(0,0,255,0.8); }
+            100% { color: #ff00ff; text-shadow: 0 0 20px rgba(255,0,255,0.8); }
+        }
+        
+        .title {
+            font-size: 24px;
+            color: white;
+            text-align: center;
+            margin-bottom: 30px;
+            font-weight: 600;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        
+        .input-group {
+            margin-bottom: 20px;
+            position: relative;
+        }
+        
+        .country-select-label {
+            display: block;
+            color: white;
+            margin-bottom: 8px;
+            font-size: 14px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.3);
+        }
+        
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid rgba(255,255,255,0.3);
+            border-radius: 8px;
+            font-size: 15px;
+            transition: all 0.3s ease;
+        }
+        
+        input:focus, select:focus {
+            background: white;
+            border-color: #3a86ff;
+            box-shadow: 0 0 15px rgba(58,134,255,0.3);
+            outline: none;
+        }
+        
+        .phone-container {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .country-code {
+            flex: 1;
+        }
+        
+        .phone-number {
+            flex: 2;
+        }
+        
+        .selected-flag {
+            position: absolute;
+            right: 30px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 14px;
+            border-radius: 2px;
+            pointer-events: none;
+        }
+        
+        .flag-option {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .flag-icon {
+            width: 20px;
+            height: 14px;
+            object-fit: cover;
+            border-radius: 2px;
+        }
+        
+        .referral-label {
+            color: white;
+            font-size: 14px;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        .optional-text {
+            color: rgba(255,255,255,0.7);
+            font-size: 12px;
+        }
+        
+        button {
+            width: 100%;
+            padding: 14px;
+            background: linear-gradient(45deg, #3a4fe0, #3a86ff);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        button::after {
+            content: '';
+            position: absolute;
+            top: -50%; left: -50%;
+            width: 200%; height: 200%;
+            background: linear-gradient(45deg, 
+                rgba(255,255,255,0) 0%, 
+                rgba(255,255,255,0.8) 50%, 
+                rgba(255,255,255,0) 100%);
+            transform: rotate(45deg);
+            animation: buttonShine 3s infinite;
+        }
+        
+        @keyframes buttonShine {
+            0% { left: -50%; }
+            100% { left: 150%; }
+        }
+        
+        button:hover {
+            background: linear-gradient(45deg, #2838b0, #2b6ac0);
+            box-shadow: 0 0 20px rgba(58,134,255,0.4);
+        }
+        
+        .toggle-form {
+            text-align: center;
+            margin-top: 20px;
+            color: white;
+            font-size: 14px;
+        }
+        
+        .toggle-form a {
+            color: #3a86ff;
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            animation: linkColorChange 4s infinite;
+            cursor: pointer;
+        }
+        
+        @keyframes linkColorChange {
+            0% { color: #3a86ff; }
+            25% { color: #00ffff; }
+            50% { color: #00ff00; }
+            75% { color: #ffff00; }
+            100% { color: #3a86ff; }
+        }
+        
+        .toggle-form a:hover {
+            color: white;
+            text-shadow: 0 0 10px rgba(255,255,255,0.5);
+        }
+        
+        .error-message,
+        .success-message,
+        .referral-status {
+            font-size: 13px;
+            margin-top: 6px;
+            padding: 8px 12px;
+            border-radius: 6px;
+            display: none;
+        }
+        
+        .error-message {
+            background: rgba(255,107,107,0.2);
+            color: #ff6b6b;
+        }
+        
+        .success-message {
+            background: rgba(81,207,102,0.2);
+            color: #51cf66;
+        }
+        
+        .referral-status.valid {
+            background: rgba(81,207,102,0.2);
+            color: #51cf66;
+        }
+        
+        .referral-status.invalid {
+            background: rgba(255,107,107,0.2);
+            color: #ff6b6b;
+        }
+        
+        #login-section { display: block; }
+        #signup-section { display: none; }
+        
+        .form-section {
+            transition: all 0.3s ease;
+        }
+        
+        @media (max-width: 480px) {
+            .form-container {
+                padding: 30px 20px;
+            }
+            
+            .title {
+                font-size: 22px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="form-container">
+        <div class="logo">
+            <div class="logo-icon">
+                <i class="fas fa-car"></i>
+            </div>
+        </div>
+        
+        <div id="login-section" class="form-section">
+            <h1 class="title">Connexion</h1>
+            <form id="loginFormData">
+                <div class="input-group">
+                    <label class="country-select-label">Veuillez sélectionner votre pays</label>
+                    <select id="loginCountryCode" class="country-code" required>
+                        <option value="" disabled selected>Choisir un pays</option>
+                        <option value="+228" class="flag-option" data-flag="https://flagcdn.com/w20/tg.png" data-country="Togo">
+                            Togo (+228)
+                        </option>
+                        <option value="+229" class="flag-option" data-flag="https://flagcdn.com/w20/bj.png" data-country="Bénin">
+                            Bénin (+229)
+                        </option>
+                        <option value="+223" class="flag-option" data-flag="https://flagcdn.com/w20/ml.png" data-country="Mali">
+                            Mali (+223)
+                        </option>
+                        <option value="+226" class="flag-option" data-flag="https://flagcdn.com/w20/bf.png" data-country="Burkina Faso">
+                            Burkina Faso (+226)
+                        </option>
+                        <option value="+225" class="flag-option" data-flag="https://flagcdn.com/w20/ci.png" data-country="Côte d'Ivoire">
+                            Côte d'Ivoire (+225)
+                        </option>
+                        <option value="+221" class="flag-option" data-flag="https://flagcdn.com/w20/sn.png" data-country="Sénégal">
+                            Sénégal (+221)
+                        </option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <input type="tel" id="loginTelephone" placeholder="Numéro de téléphone" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="loginPassword" placeholder="Mot de passe" required>
+                </div>
+                <div id="loginError" class="error-message"></div>
+                <button type="submit">Se connecter</button>
+                
+                <div class="toggle-form">
+                    <a onclick="toggleForm()">Pas encore inscrit ? Créer un compte</a>
+                </div>
+            </form>
+        </div>
+        
+        <div id="signup-section" class="form-section">
+            <h1 class="title">Inscription</h1>
+            <form id="signupFormData">
+                <div class="input-group">
+                    <input type="text" id="signupUsername" placeholder="Nom complet" required>
+                </div>
+                <div class="input-group">
+                    <label class="country-select-label">Veuillez sélectionner votre pays</label>
+                    <select id="signupCountryCode" class="country-code" required>
+                        <option value="" disabled selected>Choisir un pays</option>
+                        <option value="+228" class="flag-option" data-flag="https://flagcdn.com/w20/tg.png" data-country="Togo">
+                            Togo (+228)
+                        </option>
+                        <option value="+229" class="flag-option" data-flag="https://flagcdn.com/w20/bj.png" data-country="Bénin">
+                            Bénin (+229)
+                        </option>
+                        <option value="+223" class="flag-option" data-flag="https://flagcdn.com/w20/ml.png" data-country="Mali">
+                            Mali (+223)
+                        </option>
+                        <option value="+226" class="flag-option" data-flag="https://flagcdn.com/w20/bf.png" data-country="Burkina Faso">
+                            Burkina Faso (+226)
+                        </option>
+                        <option value="+225" class="flag-option" data-flag="https://flagcdn.com/w20/ci.png" data-country="Côte d'Ivoire">
+                            Côte d'Ivoire (+225)
+                        </option>
+                        <option value="+221" class="flag-option" data-flag="https://flagcdn.com/w20/sn.png" data-country="Sénégal">
+                            Sénégal (+221)
+                        </option>
+                    </select>
+                </div>
+                <div class="input-group">
+                    <input type="tel" id="signupTelephone" placeholder="Numéro de téléphone" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="signupPassword" placeholder="Mot de passe" required>
+                </div>
+                <div class="input-group">
+                    <input type="password" id="confirmPassword" placeholder="Confirmer votre mot de passe" required>
+                </div>
+                
+                <div class="input-group">
+                    <label class="referral-label">
+                        Parrainage <span class="optional-text">(facultatif)</span>
+                    </label>
+                    <input type="text" id="referralCode" placeholder="Code de parrainage">
+                    <div id="referralStatus" class="referral-status"></div>
+                </div>
+
+                <div id="signupError" class="error-message"></div>
+                <div id="signupSuccess" class="success-message"></div>
+                <button type="submit">S'inscrire</button>
+
+                <div class="toggle-form">
+                    <a onclick="toggleForm()">Déjà inscrit ? Se connecter</a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Fonction pour basculer entre les formulaires
+        function toggleForm() {
+            const loginSection = document.getElementById('login-section');
+            const signupSection = document.getElementById('signup-section');
+            
+            if (loginSection.style.display === 'block') {
+                loginSection.style.display = 'none';
+                signupSection.style.display = 'block';
+            } else {
+                loginSection.style.display = 'block';
+                signupSection.style.display = 'none';
+            }
+            
+            // Réinitialiser les messages d'erreur et de succès
+            clearMessages();
+        }
+
+        // Fonction pour nettoyer les messages
+        function clearMessages() {
+            const messages = ['loginError', 'signupError', 'signupSuccess', 'referralStatus'];
+            messages.forEach(id => {
+                const element = document.getElementById(id);
+                if (element) {
+                    element.style.display = 'none';
+                    element.textContent = '';
+                }
+            });
+        }
+
+        // Fonction pour mettre à jour les drapeaux des sélecteurs de pays
+        function updateSelectFlag(event) {
+            const select = event.target || this;
+            const selectedOption = select.options[select.selectedIndex];
+            
+            const existingFlag = select.parentNode.querySelector('.selected-flag');
+            if (existingFlag) {
+                existingFlag.remove();
+            }
+            
+            if (selectedOption && selectedOption.getAttribute('data-flag')) {
+                const flagUrl = selectedOption.getAttribute('data-flag');
+                const flagImg = document.createElement('img');
+                flagImg.src = flagUrl;
+                flagImg.className = 'selected-flag';
+                flagImg.alt = selectedOption.getAttribute('data-country') || '';
+                
+                select.parentNode.style.position = 'relative';
+                select.parentNode.appendChild(flagImg);
+            }
+        }
+
+        // Initialisation lors du chargement de la page
+        document.addEventListener('DOMContentLoaded', function() {
+            // Configuration des sélecteurs de pays
+            const countrySelects = document.querySelectorAll('select.country-code');
+            countrySelects.forEach(select => {
+                select.addEventListener('change', updateSelectFlag);
+                updateSelectFlag.call(select); // Mise à jour initiale
+            });
+
+            // Gestion des formulaires
+            const loginForm = document.getElementById('loginFormData');
+            const signupForm = document.getElementById('signupFormData');
+
+            if (loginForm) {
+                loginForm.addEventListener('submit', handleLogin);
+            }
+
+            if (signupForm) {
+                signupForm.addEventListener('submit', handleSignup);
+            }
+
+            // Gestion du code de parrainage
+            const referralInput = document.getElementById('referralCode');
+            if (referralInput) {
+                referralInput.addEventListener('input', debounce(handleReferralInput, 500));
+            }
+
+            // Vérifier le code de parrainage dans l'URL
+            checkReferralCodeInURL();
+        });
+
+        // Fonction debounce pour limiter les appels
+        function debounce(func, wait) {
+            let timeout;
+            return function(...args) {
+                clearTimeout(timeout);
+                timeout = setTimeout(() => func.apply(this, args), wait);
+            };
+        }
+
+        // Fonctions de validation
+        function validatePhoneNumber(phone, countryCode) {
+            phone = phone.replace(/\D/g, '');
+            const patterns = {
+                '+228': /^\d{8}$/, // Togo
+                '+229': /^\d{8}$/, // Bénin
+                '+223': /^\d{8}$/, // Mali
+                '+226': /^\d{8}$/, // Burkina Faso
+                '+225': /^\d{8}$/, // Côte d'Ivoire
+                '+221': /^\d{9}$/  // Sénégal
+            };
+            return patterns[countryCode]?.test(phone) || false;
+        }
+
+        // Fonction pour afficher les messages d'erreur
+        function showError(elementId, message) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = message;
+                element.style.display = 'block';
+            }
+        }
+
+        // Fonction pour afficher les messages de succès
+        function showSuccess(elementId, message) {
+            const element = document.getElementById(elementId);
+            if (element) {
+                element.textContent = message;
+                element.style.display = 'block';
+            }
+        }
+
+        // Gestion de la connexion
+        async function handleLogin(event) {
+            event.preventDefault();
+            clearMessages();
+
+            const telephone = document.getElementById('loginTelephone').value;
+            const password = document.getElementById('loginPassword').value;
+            const countryCode = document.getElementById('loginCountryCode').value;
+
+            if (!telephone || !password || !countryCode) {
+                showError('loginError', 'Veuillez remplir tous les champs');
+                return;
+            }
+
+            if (!validatePhoneNumber(telephone, countryCode)) {
+                showError('loginError', 'Numéro de téléphone invalide');
+                return;
+            }
+
+            try {
+                // Ici, vous pouvez ajouter votre logique de connexion
+                const email = `${telephone}@temp.com`; // Email temporaire pour Firebase
+                // Appel à votre API ou service d'authentification
+                console.log('Tentative de connexion:', { email, password });
+            } catch (error) {
+                showError('loginError', 'Erreur de connexion: ' + error.message);
+            }
+        }
+
+        // Gestion de l'inscription
+        async function handleSignup(event) {
+            event.preventDefault();
+            clearMessages();
+
+            const username = document.getElementById('signupUsername').value;
+            const telephone = document.getElementById('signupTelephone').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const countryCode = document.getElementById('signupCountryCode').value;
+            const referralCode = document.getElementById('referralCode')?.value;
+
+            // Validations
+            if (!username || !telephone || !password || !confirmPassword || !countryCode) {
+                showError('signupError', 'Veuillez remplir tous les champs requis');
+                return;
+            }
+
+            if (password !== confirmPassword) {
+                showError('signupError', 'Les mots de passe ne correspondent pas');
+                return;
+            }
+
+            if (password.length < 6) {
+                showError('signupError', 'Le mot de passe doit contenir au moins 6 caractères');
+                return;
+            }
+
+            if (!validatePhoneNumber(telephone, countryCode)) {
+                showError('signupError', 'Numéro de téléphone invalide');
+                return;
+            }
+
+            try {
+                // Ici, vous pouvez ajouter votre logique d'inscription
+                const email = `${telephone}@temp.com`; // Email temporaire pour Firebase
+                // Appel à votre API ou service d'authentification
+                console.log('Tentative d\'inscription:', { username, email, password, referralCode });
+                
+                showSuccess('signupSuccess', 'Inscription réussie ! Redirection...');
+                setTimeout(() => {
+                    window.location.href = 'accueil.html';
+                }, 2000);
+            } catch (error) {
+                showError('signupError', 'Erreur d\'inscription: ' + error.message);
+            }
+        }
+
+        // Gestion du code de parrainage
+        async function handleReferralInput() {
+            const referralInput = document.getElementById('referralCode');
+            const code = referralInput.value.trim().toUpperCase();
+            
+            if (!code) {
+                document.getElementById('referralStatus').style.display = 'none';
+                return;
+            }
+
+            try {
+                // Ici, vous pouvez ajouter votre logique de vérification du code de parrainage
+                // Simulation d'une vérification
+                const isValid = code.length === 6;
+                const statusElement = document.getElementById('referralStatus');
+                statusElement.textContent = isValid ? 'Code valide !' : 'Code invalide';
+                statusElement.className = `referral-status ${isValid ? 'valid' : 'invalid'}`;
+                statusElement.style.display = 'block';
+            } catch (error) {
+                console.error('Erreur lors de la vérification du code:', error);
+            }
+        }
+
+        // Vérification du code de parrainage dans l'URL
+        function checkReferralCodeInURL() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const referralCode = urlParams.get('ref');
+            const referralInput = document.getElementById('referralCode');
+            
+            if (referralInput && referralCode) {
+                referralInput.value = referralCode.toUpperCase();
+                handleReferralInput();
+            }
+        }
+    </script>
+   
+   <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+        import { 
+            getAuth, 
+            onAuthStateChanged,
+            createUserWithEmailAndPassword,
+            signInWithEmailAndPassword
+        } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
+        import { 
+            getDatabase, 
+            ref, 
+            get, 
+            set
+        } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js";
+        import { getStorage } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-storage.js";
+
+        // Firebase Config
+        const firebaseConfig = {
+            apiKey: "AIzaSyCRrd86FZDKvROvrliQwDoWzjSF_An6T1g",
+            authDomain: "voiture-13e08.firebaseapp.com",
+            databaseURL: "https://voiture-13e08-default-rtdb.firebaseio.com",
+            projectId: "voiture-13e08",
+            storageBucket: "voiture-13e08.firebasestorage.app",
+            messagingSenderId: "614579163299",
+            appId: "1:614579163299:web:96849a3268525c29aeaf16"
+        };  
+
+        // Initialize Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+        const storage = getStorage(app);
+
+        class Utils {
+            static generateReferralCode() {
+                const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+                return Array.from({ length: 6 }, () => 
+                    chars.charAt(Math.floor(Math.random() * chars.length))
+                ).join('');
+            }
+
+            static async checkReferralCode(code) {
+                if (!code) return null;
+                const referralRef = ref(database, 'users');
+                const snapshot = await get(referralRef);
+                
+                if (snapshot.exists()) {
+                    const users = snapshot.val();
+                    for (const userId in users) {
+                        if (users[userId].referralCode === code) {
+                            return {
+                                userId,
+                                username: users[userId].username
+                            };
+                        }
+                    }
+                }
+                return null;
+            }
+
+            static showError(elementId, message) {
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.textContent = message;
+                    element.style.display = message ? 'block' : 'none';
+                }
+            }
+
+            static showSuccess(elementId, message) {
+                const element = document.getElementById(elementId);
+                if (element) {
+                    element.textContent = message;
+                    element.style.display = message ? 'block' : 'none';
+                }
+            }
+
+            static clearMessages() {
+                ['loginError', 'signupError', 'signupSuccess', 'referralStatus'].forEach(id => {
+                    const element = document.getElementById(id);
+                    if (element) {
+                        element.textContent = '';
+                        element.style.display = 'none';
+                        element.className = element.className.replace(/(valid|invalid)/g, '').trim();
+                    }
+                });
+            }
+
+            static updateReferralStatus(isValid, message) {
+                const statusElement = document.getElementById('referralStatus');
+                if (statusElement) {
+                    statusElement.textContent = message;
+                    statusElement.className = `referral-status ${isValid ? 'valid' : 'invalid'}`;
+                    statusElement.style.display = message ? 'block' : 'none';
+                }
+            }
+        }
+
+        class FormManager {
+            static async handleSignup(event) {
+                event.preventDefault();
+                Utils.clearMessages();
+
+                try {
+                    const username = document.getElementById("signupUsername").value;
+                    const telephone = document.getElementById("signupTelephone").value;
+                    const email = `${telephone}@temp.com`;
+                    const password = document.getElementById("signupPassword").value;
+                    const confirmPassword = document.getElementById("confirmPassword").value;
+                    const referralCode = document.getElementById("referralCode")?.value;
+
+                    // Validations
+                    if (!username || !telephone || !password) {
+                        throw new Error("Veuillez remplir tous les champs requis");
+                    }
+
+                    if (password !== confirmPassword) {
+                        throw new Error("Les mots de passe ne correspondent pas");
+                    }
+
+                    if (password.length < 6) {
+                        throw new Error("Le mot de passe doit contenir au moins 6 caractères");
+                    }
+
+                    if (telephone.length < 8) {
+                        throw new Error("Numéro de téléphone invalide");
+                    }
+
+                    let referrerData = null;
+                    if (referralCode) {
+                        referrerData = await Utils.checkReferralCode(referralCode);
+                        if (!referrerData) {
+                            throw new Error("Code de parrainage invalide");
+                        }
+                    }
+
+                    const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                    const user = userCredential.user;
+                    const newReferralCode = Utils.generateReferralCode();
+
+                    await set(ref(database, 'users/' + user.uid), {
+                        username,
+                        email,
+                        phoneNumber: telephone,
+                        balance: referrerData ? 100 : 0,
+                        referralCode: newReferralCode,
+                        referredBy: referrerData?.userId || null,
+                        createdAt: Date.now()
+                    });
+
+                    if (referrerData && referrerData.userId) {
+                        const referrerRef = ref(database, `users/${referrerData.userId}`);
+                        const referrerSnapshot = await get(referrerRef);
+                        
+                        if (referrerSnapshot.exists()) {
+                            const currentBalance = referrerSnapshot.val().balance || 0;
+                            await set(ref(database, `users/${referrerData.userId}/balance`), currentBalance + 10);
+                        }
+                    }
+
+                    Utils.showSuccess("signupSuccess", "Compte créé avec succès ! Redirection...");
+                    
+                    setTimeout(() => {
+                        window.location.href = "accueil.html";
+                    }, 1500);
+
+                } catch (error) {
+                    console.error("Erreur:", error);
+                    Utils.showError("signupError", error.message);
+                }
+            }
+
+            static async handleLogin(event) {
+                event.preventDefault();
+                Utils.clearMessages();
+
+                try {
+                    const telephone = document.getElementById("loginTelephone").value;
+                    const password = document.getElementById("loginPassword").value;
+
+                    if (!telephone || !password) {
+                        throw new Error("Veuillez remplir tous les champs");
+                    }
+
+                    const email = `${telephone}@temp.com`;
+                    await signInWithEmailAndPassword(auth, email, password);
+                    window.location.href = "accueil.html";
+                } catch (error) {
+                    console.error("Erreur de connexion:", error);
+                    Utils.showError("loginError", "Numéro ou mot de passe incorrect");
+                }
+            }
+
+            static async handleReferralCodeInput() {
+                const referralInput = document.getElementById('referralCode');
+                const code = referralInput.value.trim().toUpperCase();
+                
+                if (!code) {
+                    Utils.updateReferralStatus(true, '');
+                    return;
+                }
+
+                try {
+                    const referrerData = await Utils.checkReferralCode(code);
+                    if (referrerData) {
+                        Utils.updateReferralStatus(true, `Code valide ! Parrain: ${referrerData.username}`);
+                    } else {
+                        Utils.updateReferralStatus(false, 'Code de parrainage invalide');
+                    }
+                } catch (error) {
+                    Utils.updateReferralStatus(false, 'Erreur de vérification du code');
+                }
+            }
+
+            static handleReferralCodeFromURL() {
+                const urlParams = new URLSearchParams(window.location.search);
+                const referralCode = urlParams.get('ref');
+                const referralCodeInput = document.getElementById('referralCode');
+                
+                if (referralCodeInput && referralCode) {
+                    referralCodeInput.value = referralCode.toUpperCase();
+                    FormManager.handleReferralCodeInput();
+                }
+            }
+        }
+
+        // Debounce function
+        function debounce(func, wait) {
+            let timeout;
+            return function executedFunction(...args) {
+                const later = () => {
+                    clearTimeout(timeout);
+                    func(...args);
+                };
+                clearTimeout(timeout);
+                timeout = setTimeout(later, wait);
+            };
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', () => {
+            const signupForm = document.getElementById("signupFormData");
+            const loginForm = document.getElementById("loginFormData");
+            const referralInput = document.getElementById("referralCode");
+
+            if (signupForm) {
+                signupForm.addEventListener("submit", FormManager.handleSignup);
+            }
+
+            if (loginForm) {
+                loginForm.addEventListener("submit", FormManager.handleLogin);
+            }
+
+            if (referralInput) {
+                referralInput.addEventListener("input", debounce(() => {
+                    FormManager.handleReferralCodeInput();
+                }, 500));
+            }
+
+            FormManager.handleReferralCodeFromURL();
+        });
+
+        // Auth state observer
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log("Utilisateur connecté:", user.uid);
+            } else {
+                console.log("Utilisateur déconnecté");
+            }
+        });
+    </script>
+</html>
+</body>
+</html>

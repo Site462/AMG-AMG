@@ -1,0 +1,696 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mon Argent</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f5f5;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            overflow-x: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #4c66c0 0%, #3b4fa0 100%);
+            height: 250px;
+            position: relative;
+            overflow: hidden;
+            padding: 15px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border-bottom-left-radius: 20px;
+            border-bottom-right-radius: 20px;
+            flex-shrink: 0;
+        }
+        
+        .header:after {
+            content: '';
+            background-image: url('https://image.noelshack.com/fichiers/2025/07/7/1739717999-860d2666caf66420dffeeb98a1662f74.jpg');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.2;
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            z-index: 0;
+        }
+        
+        .logo-container {
+            position: relative;
+            z-index: 1;
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo {
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            background-color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+            border: 2px solid rgba(255,255,255,0.3);
+        }
+        
+        .logo img {
+            width: 85%;
+            height: 85%;
+            object-fit: cover;
+        }
+        
+        .phone-number {
+            font-size: 18px;
+            margin-left: 12px;
+            opacity: 0.9;
+            letter-spacing: 0.5px;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .balance-container {
+            position: relative;
+            z-index: 1;
+            text-align: center;
+            margin-top: 25px;
+        }
+        
+        .balance-label {
+            font-size: 22px;
+            margin-bottom: 6px;
+            opacity: 0.9;
+            font-weight: 300;
+            text-shadow: 0 1px 2px rgba(0,0,0,0.2);
+        }
+        
+        .balance-amount {
+            font-size: 38px;
+            font-weight: bold;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+            background: linear-gradient(to right, #ffffff, #e0e0e0);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            letter-spacing: 1px;
+        }
+        
+        .actions-container {
+            display: flex;
+            justify-content: space-between;
+            padding: 0 12px;
+            margin-top: 25px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .action-button {
+            width: 47%;
+            padding: 12px 0;
+            border-radius: 50px;
+            font-size: 16px;
+            font-weight: 500;
+            color: white;
+            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+        }
+        
+        .action-button:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.2), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .action-button:hover:after {
+            opacity: 1;
+        }
+        
+        .withdraw-button {
+            background: linear-gradient(to right, #ff5a6e, #ff3b54);
+        }
+        
+        .withdraw-button:hover {
+            background: linear-gradient(to right, #ff3b54, #ff2240);
+            box-shadow: 0 5px 12px rgba(255,90,110,0.4);
+            transform: translateY(-2px);
+        }
+        
+        .deposit-button {
+            background: linear-gradient(to right, #27c0ff, #00a6e8);
+        }
+        
+        .deposit-button:hover {
+            background: linear-gradient(to right, #00a6e8, #0092d0);
+            box-shadow: 0 5px 12px rgba(39,192,255,0.4);
+            transform: translateY(-2px);
+        }
+        
+        .action-icon {
+            margin-right: 10px;
+            font-size: 18px;
+        }
+        
+        .menu-container {
+            padding: 20px 15px;
+            margin-top: 8px;
+            flex: 1;
+            overflow-y: auto;
+        }
+        
+        .menu-item {
+            background-color: #fff;
+            border-radius: 15px;
+            padding: 14px 16px;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            box-shadow: 0 3px 8px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            color: #333;
+            position: relative;
+            overflow: hidden;
+            text-decoration: none;
+        }
+        
+        .menu-item:after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0.5), transparent);
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .menu-item:hover:after {
+            opacity: 1;
+        }
+        
+        .menu-item:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
+        }
+        
+        .menu-icon {
+            width: 42px;
+            height: 42px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-size: 18px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+            transition: all 0.3s ease;
+            color: white;
+        }
+        
+        .menu-item:hover .menu-icon {
+            transform: rotate(5deg) scale(1.1);
+        }
+        
+        .history-icon { 
+            background: linear-gradient(135deg, #5e72e4, #4454c3);
+        }
+        
+        .gift-icon { 
+            background: linear-gradient(135deg, #f5365c, #e03052);
+        }
+        
+        .recharge-icon { 
+            background: linear-gradient(135deg, #2dce89, #26af74);
+        }
+        
+        .settings-icon { 
+            background: linear-gradient(135deg, #fb6340, #e95a31);
+        }
+        
+        .card-icon { 
+            background: linear-gradient(135deg, #11cdef, #0ea5bd);
+        }
+        
+        .car-icon { 
+            background: linear-gradient(135deg, #9852f9, #7838d9);
+        }
+        
+        .menu-text {
+            font-size: 16px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+        }
+        
+        .footer-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background-color: white;
+            padding: 12px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            z-index: 10;
+            flex-shrink: 0;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item.active {
+            color: #4c66c0;
+        }
+        
+        .nav-item.active .nav-icon {
+            background-color: #4c66c0;
+            color: white;
+        }
+        
+        .nav-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+            font-size: 20px;
+            background-color: #f2f3f8;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item:hover .nav-icon {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(76, 102, 192, 0.3);
+        }
+        
+        .nav-item:hover {
+            color: #4c66c0;
+        }
+        
+        .nav-label {
+            font-weight: 500;
+        }
+        
+        .car-button {
+            position: relative;
+            margin-bottom: 20px;
+        }
+        
+        .car-button .nav-icon {
+            background-color: #4c66c0;
+            color: white;
+            width: 62px;
+            height: 62px;
+            margin-top: -40px;
+            box-shadow: 0 4px 10px rgba(76, 102, 192, 0.4);
+            border: 4px solid white;
+        }
+        
+        .car-button .nav-label {
+            color: #4c66c0;
+        }
+        
+        #shape-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: -1;
+            overflow: hidden;
+        }
+        
+        .animated-shape {
+            position: absolute;
+            border-radius: 50%;
+            opacity: 0.1;
+            pointer-events: none;
+        }
+        
+        @keyframes float {
+            0% {
+                transform: translate(0, 0) rotate(0deg);
+            }
+            33% {
+                transform: translate(100px, -100px) rotate(120deg);
+            }
+            66% {
+                transform: translate(-100px, 100px) rotate(240deg);
+            }
+            100% {
+                transform: translate(0, 0) rotate(360deg);
+            }
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255,255,255,.3);
+            border-radius: 50%;
+            border-top-color: #fff;
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 10px;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Ajout du style pour le bouton de déconnexion */
+.logout-icon { 
+    background: linear-gradient(135deg, #dc3545, #c82333);
+}
+
+.
+.menu-item {
+    display: flex;
+    align-items: center;
+    text-decoration: none;
+    padding: 12px 15px;
+    color: #333;
+    transition: background-color 0.3s ease;
+}
+
+.menu-item:hover {
+    background-color: #f5f5f5;
+}
+
+.menu-icon {
+    margin-right: 12px;
+    font-size: 20px;
+    color: #666;
+}
+
+.help-icon {
+    color: #2196F3; /* Couleur bleue pour l'icône d'aide */
+}
+
+.menu-text {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.   </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo-container">
+            <div class="logo">
+                <img src="https://image.noelshack.com/fichiers/2025/07/7/1739717999-860d2666caf66420dffeeb98a1662f74.jpg" alt="Logo" />
+            </div>
+            <div class="phone-number" id="user-identifier">
+                <div class="loading-spinner"></div>
+                Chargement...
+            </div>
+        </div>
+        
+        <div class="balance-container">
+            <div class="balance-label">Mon argent</div>
+            <div class="balance-amount" id="user-balance">
+                <div class="loading-spinner"></div>
+                Chargement...
+            </div>
+        </div>
+        
+        <div class="actions-container">
+            <a href="retrait.html" class="action-button withdraw-button">
+                <span class="action-icon"><i class="fas fa-arrow-down"></i></span> Retirer
+            </a>
+            <a href="recharge.html" class="action-button deposit-button">
+                <span class="action-icon"><i class="fas fa-arrow-up"></i></span> Recharger
+            </a>
+        </div>
+    </div>
+    
+     <div class="menu-container">
+    <a href="historique retrait.html" class="menu-item">
+        <div class="menu-icon history-icon">
+            <i class="fas fa-history"></i>
+        </div>
+        <div class="menu-text">Historique de retrait</div>
+    </a>
+    
+    <a href="#miette" class="menu-item">
+        <div class="menu-icon gift-icon">
+            <i class="fas fa-gift"></i>
+        </div>
+        <div class="menu-text">Miette</div>
+    </a>
+    
+    <a href="historique.html" class="menu-item">
+        <div class="menu-icon recharge-icon">
+            <i class="fas fa-sync-alt"></i>
+        </div>
+        <div class="menu-text">Historique de recharge</div>
+    </a>
+    
+    <a href="portefeuille.html" class="menu-item">
+        <div class="menu-icon settings-icon">
+            <i class="fas fa-cog"></i>
+        </div>
+        <div class="menu-text">Configuration de compte de retrait</div>
+    </a>
+    
+    <a href="carte.html" class="menu-item">
+        <div class="menu-icon card-icon">
+            <i class="fas fa-credit-card"></i>
+        </div>
+        <div class="menu-text">Carte bancaire</div>
+    </a>
+    
+    <!-- Nouveau bouton Centre d'aide -->
+    <a href="service.html" class="menu-item">
+        <div class="menu-icon help-icon">
+            <i class="fas fa-question-circle"></i>
+        </div>
+        <div class="menu-text">Centre d'aide</div>
+    </a>
+
+    <!-- Bouton de déconnexion -->
+    <a href="index.html" class="menu-item">
+        <div class="menu-icon logout-icon">
+            <i class="fas fa-sign-out-alt"></i>
+        </div>
+        <div class="menu-text">Se déconnecter</div>
+    </a>
+</div>  
+    <div class="footer-nav">
+        <a href="accueil.html" class="nav-item active">
+            <div class="nav-icon">
+                <i class="fas fa-home"></i>
+            </div>
+            <span class="nav-label">Accueil</span>
+        </a>
+        
+        <a href="investi.html" class="nav-item">
+            <div class="nav-icon">
+                <i class="fas fa-car-side"></i>
+            </div>
+            <span class="nav-label">Véhicules</span>
+        </a>
+        
+        <a href="machine.html" class="nav-item car-button">
+            <div class="nav-icon">
+                <i class="fas fa-car"></i>
+            </div>
+            <span class="nav-label">Ma voiture</span>
+        </a>
+        
+        <a href="equipe.html" class="nav-item">
+            <div class="nav-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <span class="nav-label">Team</span>
+        </a>
+        
+        <a href="#compte" class="nav-item">
+            <div class="nav-icon">
+                <i class="fas fa-user"></i>
+            </div>
+            <span class="nav-label">Compte</span>
+        </a>
+    </div>
+    
+    <div id="shape-container"></div>
+    <script type="module">
+        // Import des modules Firebase
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+        import { getDatabase, ref, onValue } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
+
+        // Configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCRrd86FZDKvROvrliQwDoWzjSF_An6T1g",
+            authDomain: "voiture-13e08.firebaseapp.com",
+            databaseURL: "https://voiture-13e08-default-rtdb.firebaseio.com",
+            projectId: "voiture-13e08",
+            storageBucket: "voiture-13e08.appspot.com",
+            messagingSenderId: "614579163299",
+            appId: "1:614579163299:web:96849a3268525c29aeaf16"
+        };
+
+        // Initialisation de Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const database = getDatabase(app);
+
+        // Fonction pour formater le numéro de téléphone
+        function formatPhoneNumber(phoneNumber) {
+            if (!phoneNumber) return 'Non disponible';
+            return phoneNumber.replace(/(\d{2})(\d{2})(\d{2})(\d{2})(\d{2})/, '$1 $2 $3 $4 $5');
+        }
+
+        // Fonction pour formater le solde
+        function formatBalance(balance) {
+            try {
+                const amount = parseFloat(balance || 0);
+                return amount.toLocaleString('fr-FR', {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2
+                });
+            } catch (error) {
+                console.error('Erreur de formatage du solde:', error);
+                return '0,00';
+            }
+        }
+
+        // Fonction pour mettre à jour l'interface utilisateur
+        function updateUI(userData) {
+            const identifierElement = document.getElementById('user-identifier');
+            const balanceElement = document.getElementById('user-balance');
+
+            if (userData) {
+                identifierElement.textContent = formatPhoneNumber(userData.phoneNumber);
+                balanceElement.textContent = `${formatBalance(userData.balance)} XOF`;
+            } else {
+                identifierElement.textContent = 'Non connecté';
+                balanceElement.textContent = '0,00 XOF';
+            }
+        }
+
+        // Animation des formes en arrière-plan
+        function createAnimatedShapes() {
+            const container = document.getElementById('shape-container');
+            const colors = ['#3498db', '#2980b9', '#1abc9c', '#16a085', '#2ecc71', '#27ae60'];
+            const shapes = ['circle', 'square', 'triangle'];
+            const sizes = [40, 60, 80, 100];
+
+            for (let i = 0; i < 12; i++) {
+                const shape = document.createElement('div');
+                const shapeType = shapes[Math.floor(Math.random() * shapes.length)];
+                
+                shape.classList.add('animated-shape', shapeType);
+                
+                const size = sizes[Math.floor(Math.random() * sizes.length)];
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                
+                Object.assign(shape.style, {
+                    width: `${size}px`,
+                    height: `${size}px`,
+                    backgroundColor: color,
+                    position: 'absolute',
+                    top: `${Math.random() * 100}%`,
+                    left: `${Math.random() * 100}%`,
+                    opacity: 0.1 + Math.random() * 0.2,
+                    transform: `rotate(${Math.random() * 360}deg)`,
+                    transition: 'all 0.3s ease-in-out',
+                    animation: `float ${15 + Math.random() * 15}s infinite ${Math.random() * -20}s`
+                });
+
+                container.appendChild(shape);
+            }
+        }
+
+        // Styles pour l'animation
+        const styleSheet = document.createElement('style');
+        styleSheet.textContent = `
+            .animated-shape {
+                border-radius: 50%;
+            }
+            
+            .square {
+                border-radius: 0;
+            }
+            
+            .triangle {
+                width: 0 !important;
+                height: 0 !important;
+                background-color: transparent !important;
+                border-left: 25px solid transparent;
+                border-right: 25px solid transparent;
+                border-bottom: 43px solid currentColor;
+            }
+            
+            @keyframes float {
+                0%, 100% { transform: translate(0, 0) rotate(0deg); }
+                25% { transform: translate(50px, -50px) rotate(90deg); }
+                50% { transform: translate(100px, 0) rotate(180deg); }
+                75% { transform: translate(50px, 50px) rotate(270deg); }
+            }
+        `;
+        document.head.appendChild(styleSheet);
+
+        // Écouteur d'état d'authentification
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                const userRef = ref(database, 'users/' + user.uid);
+                onValue(userRef, (snapshot) => {
+                    const userData = snapshot.val();
+                    updateUI(userData);
+                }, (error) => {
+                    console.error('Erreur de lecture:', error);
+                    updateUI(null);
+                });
+            } else {
+                updateUI(null);
+            }
+        });
+
+        // Initialisation au chargement de la page
+        document.addEventListener('DOMContentLoaded', () => {
+            createAnimatedShapes();
+        });
+
+        // Gestion des erreurs globales
+        window.addEventListener('error', (event) => {
+            console.error('Erreur globale:', event.error);
+        });
+    </script>
+</body>
+</html>

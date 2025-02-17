@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Compte</title>
+    <style>
+        :root {
+            --primary-color: #7C3AED;
+            --primary-light: #DDD6FE;
+            --secondary-color: #0F172A;
+            --background-color: #F9FAFB;
+            --surface-color: #ffffff;
+            --error-color: #EF4444;
+            --success-color: #10B981;
+            --text-primary: #1F2937;
+            --text-secondary: #6B7280;
+            --border-color: #E5E7EB;
+            --border-radius: 8px;
+            --box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--background-color);
+            color: var(--text-primary);
+            min-height: 100vh;
+        }
+
+        .header {
+            background: var(--surface-color);
+            padding: 0.75rem 1rem;
+            box-shadow: var(--box-shadow);
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .header-content {
+            max-width: 600px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .back-button {
+            background: transparent;
+            color: var(--primary-color);
+            border: none;
+            width: 32px;
+            height: 32px;
+            border-radius: var(--border-radius);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 1.25rem;
+        }
+
+        .page-title {
+            font-size: 1.125rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 1rem auto;
+            padding: 0 1rem;
+        }
+
+        .form-card {
+            background: var(--surface-color);
+            border-radius: var(--border-radius);
+            box-shadow: var(--box-shadow);
+            padding: 1.25rem;
+        }
+
+        .input-group {
+            margin-bottom: 1rem;
+        }
+
+        .input-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 500;
+            margin-bottom: 0.375rem;
+            color: var(--text-secondary);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.625rem 0.75rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+            background: var(--background-color);
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(124, 58, 237, 0.1);
+        }
+
+        .operator-selector {
+            background: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 0.625rem 0.75rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            cursor: pointer;
+            font-size: 0.875rem;
+        }
+
+        .operator-icon {
+            color: var(--text-secondary);
+            font-size: 1rem;
+        }
+
+        .submit-button {
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 0.75rem 1rem;
+            border-radius: var(--border-radius);
+            font-weight: 500;
+            font-size: 0.875rem;
+            cursor: pointer;
+            width: 100%;
+            transition: all 0.2s ease;
+            margin-top: 1.5rem;
+        }
+
+        .info-card {
+            background: var(--background-color);
+            border: 1px solid var(--border-color);
+            border-radius: var(--border-radius);
+            padding: 0.75rem;
+            margin-top: 1rem;
+            display: flex;
+            gap: 0.75rem;
+            align-items: center;
+        }
+
+        .info-icon {
+            color: var(--primary-color);
+            font-size: 1rem;
+        }
+
+        .info-text {
+            font-size: 0.75rem;
+            color: var(--text-secondary);
+            line-height: 1.4;
+        }
+
+        .operator-modal {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--surface-color);
+            border-radius: 12px 12px 0 0;
+            padding: 1rem;
+            transform: translateY(100%);
+            transition: transform 0.3s ease;
+        }
+
+        .operator-modal.active {
+            transform: translateY(0);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .modal-title {
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .operator-list {
+            display: grid;
+            gap: 0.5rem;
+        }
+
+        .operator-option {
+            padding: 0.75rem;
+            border-radius: var(--border-radius);
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.875rem;
+            border: 1px solid var(--border-color);
+        }
+
+        .operator-option.selected {
+            background: var(--primary-light);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+
+        .message {
+            padding: 0.75rem;
+            border-radius: var(--border-radius);
+            margin-bottom: 0.75rem;
+            color: white;
+            font-size: 0.875rem;
+            animation: slideIn 0.2s ease;
+        }
+
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --background-color: #1F2937;
+                --surface-color: #111827;
+                --text-primary: #F9FAFB;
+                --text-secondary: #9CA3AF;
+                --border-color: #374151;
+            }
+        }
+        
+        /* Ajouter les styles spécifiques pour chaque opérateur */
+        .operator-option[data-operator="MTN"] {
+            background-color: #FEF9C3;
+            border-color: #FDE047;
+            color: #854D0E;
+        }
+
+        .operator-option[data-operator="MOOV"] {
+            background-color: #E0E7FF;
+            border-color: #818CF8;
+            color: #3730A3;
+        }
+
+        .operator-option[data-operator="ORANGE"] {
+            background-color: #FFE4E6;
+            border-color: #FDA4AF;
+            color: #9F1239;
+        }
+
+        .operator-option[data-operator="WAVE"] {
+            background-color: #DCFCE7;
+            border-color: #86EFAC;
+            color: #166534;
+        }
+
+        .operator-option[data-operator="USDT"] {
+            background-color: #CCFBF1;
+            border-color: #5EEAD4;
+            color: #134E4A;
+        }
+
+        /* Styles pour les options sélectionnées */
+        .operator-option.selected[data-operator="MTN"] {
+            background-color: #FDE047;
+            border-color: #854D0E;
+        }
+
+        .operator-option.selected[data-operator="MOOV"] {
+            background-color: #818CF8;
+            border-color: #3730A3;
+        }
+
+        .operator-option.selected[data-operator="ORANGE"] {
+            background-color: #FDA4AF;
+            border-color: #9F1239;
+        }
+
+        .operator-option.selected[data-operator="WAVE"] {
+            background-color: #86EFAC;
+            border-color: #166534;
+        }
+
+        .operator-option.selected[data-operator="USDT"] {
+            background-color: #5EEAD4;
+            border-color: #134E4A;
+        }
+
+        /* Style pour l'affichage de l'opérateur sélectionné */
+        .operator-selector[data-operator="MTN"] { border-color: #FDE047; }
+        .operator-selector[data-operator="MOOV"] { border-color: #818CF8; }
+        .operator-selector[data-operator="ORANGE"] { border-color: #FDA4AF; }
+        .operator-selector[data-operator="WAVE"] { border-color: #86EFAC; }
+        .operator-selector[data-operator="USDT"] { border-color: #5EEAD4; }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <button class="back-button" onclick="history.back()"></button>
+            <h1 class="page-title">Enregistrement de compte de retrait </h1>
+        </div>
+    </header>
+
+    <div class="container">
+        <div id="message"></div>
+
+        <div class="form-card">
+            <div class="input-group">
+                <label class="input-label">Nom du propriétaire</label>
+                <input type="text" class="input-field field-input" id="ownerName" placeholder="Entrez le nom complet">
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">Numéro de compte</label>
+                <input type="tel" class="input-field field-input" id="phone" placeholder="229-225-226-221-228-223">
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">Code de retrait</label>
+                <input type="password" class="input-field field-input" id="code" placeholder="Entrez votre code">
+            </div>
+
+            <div class="input-group">
+                <label class="input-label">Opérateur</label>
+                <input type="hidden" id="operator" value="MTN">
+                <div class="operator-selector" id="operatorSelector" data-operator="MTN">
+                    <span class="operator-value" id="selectedType">MTN</span>
+                    <span class="operator-icon">›</span>
+                </div>
+            </div>
+
+            <button class="submit-button" id="submitBtn">
+                Enregistrer
+            </button>
+        </div>
+
+        <div class="info-card">
+            <span class="info-icon">ℹ</span>
+            <p class="info-text">
+                Vérifiez vos informations avant de soumettre pour assurer un traitement rapide de votre demande.
+            </p>
+        </div>
+    </div>
+
+    <div class="operator-modal" id="operatorModal">
+        <div class="modal-header">
+            <button class="back-button" id="closeModal">×</button>
+            <h2 class="modal-title">Choisir l'opérateur</h2>
+            <button class="back-button" id="confirmOperator">✓</button>
+        </div>
+
+        <div class="operator-list">
+            <div class="operator-option selected" data-operator="MTN">MTN</div>
+            <div class="operator-option" data-operator="MOOV">MOOV</div>
+            <div class="operator-option" data-operator="ORANGE">ORANGE</div>
+            <div class="operator-option" data-operator="WAVE">WAVE</div>
+            <div class="operator-option" data-operator="USDT">USDT</div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-app.js';
+        import { getAuth, onAuthStateChanged } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-auth.js';
+        import { getDatabase, ref, onValue, set } from 'https://www.gstatic.com/firebasejs/10.7.0/firebase-database.js';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyCRrd86FZDKvROvrliQwDoWzjSF_An6T1g",
+            authDomain: "voiture-13e08.firebaseapp.com",
+            databaseURL: "https://voiture-13e08-default-rtdb.firebaseio.com",
+            projectId: "voiture-13e08",
+            storageBucket: "voiture-13e08.appspot.com",
+            messagingSenderId: "614579163299",
+            appId: "1:614579163299:web:96849a3268525c29aeaf16"
+        };
+
+        document.addEventListener('DOMContentLoaded', function() {
+            const app = initializeApp(firebaseConfig);
+            const db = getDatabase();
+            const auth = getAuth();
+
+            // Gestion de la modale des opérateurs
+            const operatorSelector = document.getElementById('operatorSelector');
+            const operatorModal = document.getElementById('operatorModal');
+            const closeModal = document.getElementById('closeModal');
+            const confirmOperator = document.getElementById('confirmOperator');
+            const options = document.querySelectorAll('.operator-option');
+            const selectedType = document.getElementById('selectedType');
+            const operatorInput = document.getElementById('operator');
+            const submitBtn = document.getElementById('submitBtn');
+
+            function showModal() {
+                operatorModal.classList.add('active');
+            }
+
+            function hideModal() {
+                operatorModal.classList.remove('active');
+            }
+
+            operatorSelector.addEventListener('click', showModal);
+            closeModal.addEventListener('click', hideModal);
+
+            options.forEach(option => {
+                option.addEventListener('click', () => {
+                    options.forEach(opt => opt.classList.remove('selected'));
+                    option.classList.add('selected');
+                });
+            });
+
+            confirmOperator.addEventListener('click', () => {
+                const selected = document.querySelector('.operator-option.selected');
+                const selectedOperator = selected.dataset.operator;
+                operatorInput.value = selectedOperator;
+                selectedType.textContent = selectedOperator;
+                operatorSelector.dataset.operator = selectedOperator;
+                hideModal();
+            });
+
+            // Fonction d'affichage des messages
+            function showMessage(text, type) {
+                const messageDiv = document.getElementById('message');
+                const div = document.createElement('div');
+                div.className = `message message-${type}`;
+                div.style.backgroundColor = type === 'error' ? 'var(--error-color)' : 'var(--success-color)';
+                div.textContent = text;
+                messageDiv.innerHTML = '';
+                messageDiv.appendChild(div);
+                setTimeout(() => div.remove(), 3000);
+            }
+
+            // Validation et soumission du formulaire
+            async function setupWithdrawal() {
+                const ownerName = document.getElementById('ownerName').value.trim();
+                const phone = document.getElementById('phone').value.trim();
+                const code = document.getElementById('code').value.trim();
+                const operator = operatorInput.value;
+
+                if (!ownerName || !phone || !code) {
+                    showMessage('Veuillez remplir tous les champs', 'error');
+                    return;
+                }
+
+                if (code.length < 4) {
+                    showMessage('Le code de retrait doit contenir au moins 4 caractères', 'error');
+                    return;
+                }
+
+                try {
+                    const user = auth.currentUser;
+                    if (!user) {
+                        showMessage('Vous devez être connecté pour effectuer cette opération', 'error');
+                        setTimeout(() => window.location.href = 'login.html', 2000);
+                        return;
+                    }
+
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Enregistrement en cours...';
+
+                    await set(ref(db, `users/${user.uid}/withdrawalConfig`), {
+                        ownerName,
+                        phone,
+                        operator,
+                        code,
+                        configuredAt: Date.now(),
+                        lastUpdated: new Date().toISOString()
+                    });
+
+                    showMessage('Configuration enregistrée avec succès !', 'success');
+                    setTimeout(() => window.location.href = 'carte.html', 2000);
+
+                } catch (error) {
+                    console.error('Erreur lors de l\'enregistrement:', error);
+                    showMessage('Une erreur est survenue lors de l\'enregistrement', 'error');
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Enregistrer';
+                }
+            }
+
+            // Chargement des données existantes
+            function loadExistingData() {
+                const user = auth.currentUser;
+                if (!user) return;
+
+                const configRef = ref(db, `users/${user.uid}/withdrawalConfig`);
+                onValue(configRef, (snapshot) => {
+                    const data = snapshot.val();
+                    if (data) {
+                        document.getElementById('ownerName').value = data.ownerName || '';
+                        document.getElementById('phone').value = data.phone || '';
+                        document.getElementById('code').value = data.code || '';
+                        operatorInput.value = data.operator || 'MTN';
+                        selectedType.textContent = data.operator || 'MTN';
+                        operatorSelector.dataset.operator = data.operator || 'MTN';
+                    }
+                });
+            }
+
+            // Vérification de l'authentification
+            onAuthStateChanged(auth, (user) => {
+                if (!user) {
+                    window.location.href = 'login.html';
+                    return;
+                }
+                loadExistingData();
+            });
+
+            // Écouteurs d'événements
+            submitBtn.addEventListener('click', setupWithdrawal);
+            
+            document.querySelectorAll('.field-input').forEach(input => {
+                input.addEventListener('keypress', (e) => {
+                    if (e.key === 'Enter') {
+                        setupWithdrawal();
+                    }
+                });
+            });
+        });
+    </script>
+</body>
+</html>

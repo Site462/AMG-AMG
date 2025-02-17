@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mes Maisons</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Poppins', sans-serif;
+        }
+
+        body {
+            background: #f8f9fd;
+            padding: 15px;
+            max-width: 580px;
+            margin: 0 auto;
+        }
+
+        .header {
+            font-size: 24px;
+            font-weight: 600;
+            color: #2d3748;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+
+        .stats-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 15px;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .stat-value {
+            font-size: 24px;
+            font-weight: 600;
+            color: #e67e22;
+            margin: 5px 0;
+        }
+
+        .stat-label {
+            font-size: 13px;
+            color: #718096;
+        }
+
+        .vip-card {
+            background: white;
+            border-radius: 12px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.08);
+        }
+
+        .vip-header {
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .vip-logo {
+            width: 50px;
+            height: 50px;
+            background: #e67e22;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+        }
+
+        .vip-title {
+            font-size: 16px;
+            font-weight: 600;
+            color: #2d3748;
+        }
+
+        .vip-details {
+            padding: 15px;
+            background: #fafbfd;
+            font-size: 13px;
+        }
+
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            color: #4a5568;
+        }
+
+        .progress-container {
+            padding: 15px;
+        }
+
+        .progress-header {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 8px;
+            font-size: 13px;
+            color: #718096;
+        }
+
+        .progress-bar {
+            height: 6px;
+            background: #edf2f7;
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: #e67e22;
+            border-radius: 3px;
+        }
+
+        .collect-btn {
+            width: calc(100% - 30px);
+            margin: 0 15px 15px;
+            padding: 10px;
+            background: #e67e22;
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            font-size: 14px;
+            cursor: pointer;
+        }
+
+        .collect-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            padding: 12px 24px;
+            border-radius: 8px;
+            color: white;
+            font-weight: 600;
+            display: none;
+            z-index: 1000;
+        }
+
+        .notification.success { background: #10b981; }
+        .notification.error { background: #ef4444; }
+    </style>
+</head>
+<body>
+    <div class="header">Centre des voitures </div>
+    <div class="stats-container">
+        <div class="stat-card">
+            <div class="stat-label">Total voiture acheté </div>
+            <div class="stat-value" id="total-vips">0</div>
+        </div>
+        <div class="stat-card">
+            <div class="stat-label">Bénéfices gagné </div>
+            <div class="stat-value" id="total-revenue">0</div>
+        </div>
+    </div>
+    <div id="vips-container"></div>
+    <div class="notification"></div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
+        import { getDatabase, ref, get, update, onValue } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js";
+
+        const VIP_CONFIG = {
+            1: { dailyRevenue: 200, cycleDuration: 124, totalRevenue: 24800 },
+            2: { dailyRevenue: 700, cycleDuration: 124, totalRevenue:86800  },
+            3: { dailyRevenue: 1000, cycleDuration: 124, totalRevenue: 124000 },
+            4: { dailyRevenue: 3000, cycleDuration: 124, totalRevenue: 372000 },
+            5: { dailyRevenue: 6000, cycleDuration: 124, totalRevenue: 744000 },
+            6: { dailyRevenue: 10200, cycleDuration: 21, totalRevenue: 214200 },
+            7: { dailyRevenue: 20450, cycleDuration: 21, totalRevenue: 429450 }
+        };
+
+        const app = initializeApp({
+            apiKey: "AIzaSyCRrd86FZDKvROvrliQwDoWzjSF_An6T1g",
+            authDomain: "voiture-13e08.firebaseapp.com",
+            databaseURL: "https://voiture-13e08-default-rtdb.firebaseio.com",
+            projectId: "voiture-13e08",
+            storageBucket: "voiture-13e08.firebasestorage.app",
+            messagingSenderId: "614579163299",
+            appId: "1:614579163299:web:96849a3268525c29aeaf16"
+        });
+
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+        let currentUser = null;
+
+        function showNotification(message, type) {
+            const notification = document.querySelector('.notification');
+            notification.textContent = message;
+            notification.className = `notification ${type}`;
+            notification.style.display = 'block';
+            setTimeout(() => notification.style.display = 'none', 3000);
+        }
+
+        function calculateProgress(investment) {
+            const config = VIP_CONFIG[investment.productId];
+            const totalCollected = investment.totalCollected || 0;
+            const progress = (totalCollected / config.totalRevenue) * 100;
+            const daysInCycle = Math.floor((Date.now() - investment.timestamp) / (1000 * 60 * 60 * 24));
+            const remainingDays = Math.max(0, config.cycleDuration - daysInCycle);
+
+            return {
+                isComplete: totalCollected >= config.totalRevenue,
+                progress: Math.min(progress, 100),
+                remainingDays
+            };
+        }
+
+        function isReadyToCollect(investment) {
+            const lastCollection = investment.lastCollection || 0;
+            const now = new Date();
+            const lastCollectionDate = new Date(lastCollection);
+            return lastCollectionDate.getDate() !== now.getDate() ||
+                   lastCollectionDate.getMonth() !== now.getMonth() ||
+                   lastCollectionDate.getFullYear() !== now.getFullYear();
+        }
+
+        async function loadVIPs() {
+            if (!currentUser) return;
+            try {
+                const snapshot = await get(ref(db, `investments/${currentUser.uid}`));
+                if (!snapshot.exists()) {
+                    document.getElementById('vips-container').innerHTML = '<div style="text-align:center;padding:15px">Aucune maison active</div>';
+                    return;
+                }
+
+                const investments = [];
+                snapshot.forEach(child => {
+                    const investment = { id: child.key, ...child.val() };
+                    if (investment.status === 'active') investments.push(investment);
+                });
+
+                document.getElementById('total-vips').textContent = investments.length;
+                document.getElementById('total-revenue').textContent = 
+                    investments.reduce((sum, inv) => sum + (inv.totalCollected || 0), 0).toLocaleString() + ' XOF';
+
+                document.getElementById('vips-container').innerHTML = investments.map(investment => {
+                    const config = VIP_CONFIG[investment.productId];
+                    const { isComplete, progress, remainingDays } = calculateProgress(investment);
+                    const canCollect = !isComplete && isReadyToCollect(investment);
+
+                    return `
+                        <div class="vip-card">
+                            <div class="vip-header">
+                                <div class="vip-logo">V${investment.productId}</div>
+                                <div>
+                                    <div class="vip-title">Voiture ${investment.productId}</div>
+                                    <div class="stat-label">${config.dailyRevenue.toLocaleString()} XOF/jour</div>
+                                </div>
+                            </div>
+                            <div class="vip-details">
+                                <div class="detail-row">
+                                    <span>Investissement</span>
+                                    <span>${new Date(investment.timestamp).toLocaleDateString()}</span>
+                                </div>
+                                <div class="detail-row">
+                                    <span>Jours restants</span>
+                                    <span>${remainingDays}</span>
+                                </div>
+                            </div>
+                            <div class="progress-container">
+                                <div class="progress-header">
+                                    <span>Total collecté</span>
+                                    <span>${(investment.totalCollected || 0).toLocaleString()} / ${config.totalRevenue.toLocaleString()}</span>
+                                </div>
+                                <div class="progress-bar">
+                                    <div class="progress-fill" style="width:${progress}%"></div>
+                                </div>
+                            </div>
+                            <button 
+                                class="collect-btn"
+                                onclick="collectRevenue('${investment.id}')"
+                                ${(!canCollect || isComplete) ? 'disabled' : ''}>
+                                ${isComplete ? 'Terminé' : (canCollect ? 'Réclamer' : 'Déjà réclamé')}
+                            </button>
+                        </div>
+                    `;
+                }).join('');
+            } catch (error) {
+                showNotification("Erreur de chargement", "error");
+            }
+        }
+
+        window.collectRevenue = async function(investmentId) {
+            if (!currentUser) return;
+            try {
+                const [investmentSnap, userSnap] = await Promise.all([
+                    get(ref(db, `investments/${currentUser.uid}/${investmentId}`)),
+                    get(ref(db, `users/${currentUser.uid}`))
+                ]);
+
+                const investment = investmentSnap.val();
+                const user = userSnap.val();
+                const config = VIP_CONFIG[investment.productId];
+                
+                if (!investment || !config) throw new Error("Données invalides");
+                
+                const newTotal = (investment.totalCollected || 0) + config.dailyRevenue;
+                if (newTotal > config.totalRevenue) throw new Error("Cycle terminé");
+
+                await update(ref(db), {
+                    [`users/${currentUser.uid}/balance`]: (user.balance || 0) + config.dailyRevenue,
+                    [`investments/${currentUser.uid}/${investmentId}/lastCollection`]: Date.now(),
+                    [`investments/${currentUser.uid}/${investmentId}/totalCollected`]: newTotal
+                });
+
+                showNotification(`+${config.dailyRevenue.toLocaleString()} XOF`, "success");
+            } catch (error) {
+                showNotification(error.message || "Erreur de collecte", "error");
+            }
+        };
+
+        onAuthStateChanged(auth, user => {
+            if (user) {
+                currentUser = user;
+                loadVIPs();
+                onValue(ref(db, `investments/${user.uid}`), loadVIPs);
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+    </script>
+</body>
+</html>

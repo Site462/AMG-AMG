@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Galerie de Voitures de Luxe</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;600&family=Poppins:wght@300;400;500&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        body {
+            min-height: 100vh;
+            background-color: #f8fafc;
+            font-family: 'Poppins', sans-serif;
+            padding-bottom: 100px;
+            position: relative;
+        }
+
+        .gallery {
+            padding: 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+            padding-bottom: 100px;
+        }
+
+        .header {
+            text-align: center;
+            padding: 2rem 1rem;
+            background: linear-gradient(to right, #1e293b, #334155);
+            color: white;
+            margin-bottom: 2rem;
+            border-radius: 1rem;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+        }
+
+        .gallery-title {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .gallery-subtitle {
+            color: #e2e8f0;
+            font-size: 1.1rem;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .gallery-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 0 1rem;
+        }
+
+        .gallery-item {
+            background: white;
+            border-radius: 1rem;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .gallery-item:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+        }
+
+        .gallery-image {
+            position: relative;
+            padding-top: 66.67%;
+            background-color: #e2e8f0;
+            overflow: hidden;
+        }
+
+        .gallery-image img {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: transform 0.5s ease;
+        }
+
+        .gallery-item:hover .gallery-image img {
+            transform: scale(1.05);
+        }
+
+        .gallery-badge {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(30, 41, 59, 0.9);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .gallery-content {
+            padding: 1.5rem;
+        }
+
+        .gallery-title-item {
+            font-family: 'Playfair Display', serif;
+            font-size: 1.5rem;
+            color: #1e293b;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+        }
+
+        .gallery-description {
+            color: #64748b;
+            font-size: 0.95rem;
+            line-height: 1.6;
+            margin-bottom: 1rem;
+        }
+
+        .gallery-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding-top: 1rem;
+            border-top: 1px solid #e2e8f0;
+        }
+
+        .gallery-price {
+            color: #3b82f6;
+            font-weight: 500;
+            font-size: 1.1rem;
+        }
+
+        .gallery-rating {
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+            background: #f8fafc;
+            padding: 0.5rem 1rem;
+            border-radius: 2rem;
+        }
+
+        .gallery-rating i {
+            color: #eab308;
+        }
+
+        .specs-list {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+            padding: 0.5rem 0;
+            border-top: 1px solid #e2e8f0;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .spec-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .spec-item i {
+            color: #3b82f6;
+        }
+
+        /* Styles pour la barre de navigation */
+        .footer-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background-color: white;
+            padding: 12px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #4c66c0;
+        }
+
+        .nav-item.active .nav-icon {
+            background-color: #4c66c0;
+            color: white;
+        }
+
+        .nav-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+            font-size: 20px;
+            background-color: #f2f3f8;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover .nav-icon {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(76, 102, 192, 0.3);
+        }
+
+        .nav-item:hover {
+            color: #4c66c0;
+        }
+
+        .nav-label {
+            font-weight: 500;
+        }
+
+        .car-button {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .car-button .nav-icon {
+            background-color: #4c66c0;
+            color: white;
+            width: 62px;
+            height: 62px;
+            margin-top: -40px;
+            box-shadow: 0 4px 10px rgba(76, 102, 192, 0.4);
+            border: 4px solid white;
+        }
+
+        .car-button .nav-label {
+            color: #4c66c0;
+        }
+
+        @media (max-width: 768px) {
+            .gallery-grid {
+                gap: 1rem;
+            }
+
+            .gallery-title {
+                font-size: 2rem;
+            }
+
+            .gallery-subtitle {
+                font-size: 1rem;
+            }
+        }
+
+        @supports (padding: max(0px)) {
+            .footer-nav {
+                padding-bottom: max(0px, env(safe-area-inset-bottom));
+            }
+        }
+    </style>
+</head>
+<body>
+    <main class="gallery">
+        <header class="header">
+            <h1 class="gallery-title">Notre Collection de Voitures</h1>
+            <p class="gallery-subtitle">Découvrez notre sélection exclusive de voitures de luxe et de sport</p>
+        </header>
+        
+        <!-- Remplacez la section gallery-grid existante par celle-ci : -->
+
+<div class="gallery-grid">
+    <!-- Mercedes-AMG GT -->
+    <article class="gallery-item">
+        <div class="gallery-image">
+            <img src="https://image.noelshack.com/fichiers/2025/08/1/1739782884-mercedes-benz-g500-amg-my2025.jpg" alt="Mercedes-AMG GT">
+            <div class="gallery-badge">Nouveau</div>
+        </div>
+        <div class="gallery-content">
+            <h2 class="gallery-title-item">Mercedes-AMG GT</h2>
+            <p class="gallery-description">Le coupé sportif par excellence, alliant performances exceptionnelles et luxe incomparable.</p>
+            <div class="specs-list">
+                <div class="spec-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>585 ch</span>
+                </div>
+                <div class="spec-item">
+                    <i class="fas fa-clock"></i>
+                    <span>3.2s 0-100</span>
+                </div>
+                <div class="spec-item">
+                    <i class="fas fa-gas-pump"></i>
+                    <span>V8 Biturbo</span>
+                </div>
+            </div>
+            <div class="gallery-meta">
+                <span class="gallery-price">À partir de 135 000 €</span>
+                <div class="gallery-rating">
+                    <i class="fas fa-star"></i>
+                    <span>4.9</span>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <!-- Mercedes-AMG C63 S -->
+    <article class="gallery-item">
+        <div class="gallery-image">
+            <img src="https://image.noelshack.com/fichiers/2025/08/1/1739783835-2020-mercedes-amg-c-63-s-coupe-02-dw.jpg" alt="Mercedes-AMG C63 S">
+            <div class="gallery-badge">Hybride</div>
+        </div>
+        <div class="gallery-content">
+            <h2 class="gallery-title-item">Mercedes-AMG C63 S</h2>
+            <p class="gallery-description">La berline sportive qui redéfinit les standards de performance dans sa catégorie.</p>
+            <div class="specs-list">
+                <div class="spec-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>680 ch</span>
+                </div>
+                <div class="spec-item">
+                    <i class="fas fa-clock"></i>
+                    <span>3.4s 0-100</span>
+                </div>
+                <div class="spec-item">
+                    <i class="fas fa-bolt"></i>
+                    <span>Hybride</span>
+                </div>
+            </div>
+            <div class="gallery-meta">
+                <span class="gallery-price">À partir de 125 000 €</span>
+                <div class="gallery-rating">
+                    <i class="fas fa-star"></i>
+                    <span>4.8</span>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <!-- Mercedes-AMG G63 -->
+    <article class="gallery-item">
+        <div class="gallery-image">
+            <img src="https://image.noelshack.com/fichiers/2025/08/1/1739783955-f8216e7b-760a-4a38-ac88-f33b4b1543b5.jpg" alt="Mercedes-AMG G63">
+            <div class="gallery-badge">Luxe</div>
+        </div>
+        <div class="gallery-content">
+            <h2 class="gallery-title-item">Mercedes-AMG G63</h2>
+            <p class="gallery-description">L'icône tout-terrain dans sa version la plus puissante, alliance parfaite entre luxe et performance.</p>
+            <div class="specs-list">
+                <div class="spec-item">
+                    <i class="fas fa-tachometer-alt"></i>
+                    <span>585 ch</span>
+                </div>
+                <div class="spec-item">
+                    <i class="fas fa-clock"></i>
+                    <span>4.5s 0-100</span>
+                </div>
+                <div class="spec-item">
+                    <i class="fas fa-gas-pump"></i>
+                    <span>V8 Biturbo</span>
+                </div>
+            </div>
+            <div class="gallery-meta">
+                <span class="gallery-price">À partir de 185 000 €</span>
+                <div class="gallery-rating">
+                    <i class="fas fa-star"></i>
+                    <span>4.7</span>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <!-- Mercedes-AMG EQS 53 -->
+    <article class="gallery-item">
+        <div class="gallery-image">
+            <img src="https://image.noelshack.com/fichiers/2025/08/1/1739784102-16-mercedes-amg-eqs-uk.jpg" alt="Mercedes-AMG EQS 53">
+            <div class="gallery-badge">Électrique</div>
+        </div>
+        <div class="gallery-content">
+            <h2 class="gallery-title-item">Mercedes-AMG EQS 53</h2>
+            <p class="gallery-description">La berline électrique de luxe qui combine performances AMG et mobilité durable.</p>
+            <div class="specs-list">
+                <div class="spec-item">
+                    <i class="fas fa-bolt"></i>
+                    <span>761 ch</span>
+                </div>
+                <div class="spec-item">
+                    <i class="fas fa-clock"></i>
+                    <span>3.4s 0-100</span>
+                </div>
+                <div class="spec-item">
+                    <i class="fas fa-battery-full"></i>
+                    <span>580 km</span>
+                </div>
+            </div>
+            <div class="gallery-meta">
+                <span class="gallery-price">À partir de 155 000 €</span>
+                <div class="gallery-rating">
+                    <i class="fas fa-star"></i>
+                    <span>4.8</span>
+                </div>
+            </div>
+        </div>
+    </article>
+</div>
+
+    <div class="footer-nav">
+        <a href="#" class="nav-item active">
+            <div class="nav-icon">
+                <i class="fas fa-home"></i>
+            </div>
+            <span class="nav-label">Accueil</span>
+        </a>
+        
+        <a href="investi.html" class="nav-item">
+            <div class="nav-icon">
+                <i class="fas fa-car-side"></i>
+            </div>
+            <span class="nav-label">Véhicules</span>
+        </a>
+        
+        <a href="machine.html" class="nav-item car-button">
+            <div class="nav-icon">
+                <i class="fas fa-car"></i>
+            </div>
+            <span class="nav-label">Ma voiture</span>
+        </a>
+        
+        <a href="equipe.html" class="nav-item">
+            <div class="nav-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <span class="nav-label">Team</span>
+        </a>
+        
+        <a href="solde.html" class="nav-item">
+            <div class="nav-icon">
+                <i class="fas fa-user"></i>
+            </div>
+            <span class="nav-label">Compte</span>
+        </a>
+    </div>
+
+    <script>
+        // Animation pour les éléments de navigation
+        const navItems = document.querySelectorAll('.nav-item');
+        
+        navItems.forEach(item => {
+            item.addEventListener('click', function(e) {
+                // Retirer la classe active de tous les éléments
+                navItems.forEach(navItem => {
+                    navItem.classList.remove('active');
+                });
+                
+                // Ajouter la classe active à l'élément cliqué
+                this.classList.add('active');
+                
+                // Animation au clic
+                const icon = this.querySelector('.nav-icon');
+                icon.style.transform = 'scale(0.95)';
+                setTimeout(() => {
+                    icon.style.transform = 'translateY(-3px)';
+                }, 100);
+            });
+        });
+    </script>
+</body>
+</html>

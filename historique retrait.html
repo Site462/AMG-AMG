@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .card {
+            background: white;
+            border-radius: 12px;
+            padding: 20px;
+            margin: 15px 0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .titre {
+            color: #2c3e50;
+            font-size: 20px;
+            margin-bottom: 20px;
+            margin-left: 30px;
+        }
+
+        .back-arrow {
+            text-decoration: none;
+            color: #2c3e50;
+            font-size: 24px;
+            position: absolute;
+            top: 20px;
+            left: 20px;
+        }
+
+        .retrait-info {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+
+        .retrait-label {
+            font-size: 18px;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .retrait-amount {
+            font-size: 18px;
+            color: #ff4444;
+            font-weight: bold;
+        }
+
+        .retrait-date {
+            color: #666;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        .retrait-net {
+            color: #666;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        .retrait-status {
+            color: #3498db;
+            font-size: 14px;
+            margin: 5px 0;
+        }
+
+        .arrow-icon {
+            color: #666;
+            margin-left: 10px;
+        }
+        
+       .card {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.retrait-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.retrait-label {
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+}
+
+.retrait-amount {
+    font-weight: bold;
+    font-size: 18px;
+    color: #FF4444;
+}
+
+.retrait-date {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.retrait-net {
+    color: #444;
+    font-size: 15px;
+}
+
+#history-container {
+    padding: 10px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.back-arrow {
+    padding: 15px;
+    cursor: pointer;
+} 
+
+.card {
+    background: white;
+    border-radius: 10px;
+    padding: 15px;
+    margin: 10px 0;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.retrait-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+}
+
+.retrait-label {
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+}
+
+.retrait-amount {
+    font-weight: bold;
+    font-size: 18px;
+    color: #FF4444;
+}
+
+.retrait-date {
+    color: #666;
+    font-size: 14px;
+    margin-bottom: 10px;
+}
+
+.retrait-status {
+    font-size: 14px;
+    margin-bottom: 10px;
+    font-weight: 500;
+}
+
+.status-green {
+    color: #4CAF50;
+}
+
+.status-red {
+    color: #F44336;
+}
+
+.status-blue {
+    color: #2196F3;
+}
+
+.retrait-net {
+    color: #444;
+    font-size: 15px;
+}
+
+#history-container {
+    padding: 10px;
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.back-arrow {
+    padding: 15px;
+    cursor: pointer;
+}
+    </style>
+</head>
+<body>
+    <a href="#" class="back-arrow"></a>
+    <h1 class="titre">Mes preuves de retrait </h1>
+    
+    <div id="history-container">
+        <!-- Les cartes de retrait seront injectées ici -->
+    </div>
+
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyCRrd86FZDKvROvrliQwDoWzjSF_An6T1g",
+    authDomain: "voiture-13e08.firebaseapp.com",
+    databaseURL: "https://voiture-13e08-default-rtdb.firebaseio.com",
+    projectId: "voiture-13e08",
+    storageBucket: "voiture-13e08.firebaseapp.com",
+    messagingSenderId: "614579163299",
+    appId: "1:614579163299:web:96849a3268525c29aeaf16"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const database = getDatabase(app);
+
+function formatAmount(amount) {
+    return `${amount.toLocaleString('fr-FR')} FCFA`;
+}
+
+function formatDate(timestamp) {
+    return new Date(timestamp).toLocaleString('fr-FR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+    });
+}
+
+function getStatusColor(status) {
+    switch(status?.toUpperCase()) {
+        case 'APPROUVÉ':
+            return 'status-green';
+        case 'REJETÉ':
+            return 'status-red';
+        default:
+            return 'status-blue';
+    }
+}
+
+function createWithdrawalCard(withdrawal) {
+    const statusText = withdrawal.status?.toUpperCase() || 'EN ATTENTE';
+    const statusClass = getStatusColor(withdrawal.status);
+    
+    return `
+        <div class="card">
+            <div class="retrait-header">
+                <span class="retrait-label">RETRAIT</span>
+                <span class="retrait-amount">- ${formatAmount(withdrawal.amount)}</span>
+            </div>
+            <div class="retrait-date">
+                ${formatDate(withdrawal.timestamp)}
+            </div>
+            <div class="retrait-status ${statusClass}" id="status-${withdrawal.timestamp}">
+                ${statusText}
+            </div>
+            <div class="retrait-net">
+                Net reçu: ${formatAmount(withdrawal.amount - (withdrawal.fees || 0))}
+            </div>
+        </div>
+    `;
+}
+
+function updateStatus(withdrawalId, status) {
+    const statusElement = document.getElementById(`status-${withdrawalId}`);
+    if (statusElement) {
+        const statusText = status?.toUpperCase() || 'EN ATTENTE';
+        statusElement.textContent = statusText;
+        statusElement.className = `retrait-status ${getStatusColor(status)}`;
+    }
+}
+
+function displayWithdrawalHistory(history) {
+    const container = document.getElementById('history-container');
+    
+    if (!history || Object.keys(history).length === 0) {
+        container.innerHTML = `
+            <div class="card">
+                Aucun historique de retrait disponible
+            </div>`;
+        return;
+    }
+
+    container.innerHTML = '';
+    Object.entries(history)
+        .sort(([, a], [, b]) => b.timestamp - a.timestamp)
+        .forEach(([key, withdrawal]) => {
+            container.innerHTML += createWithdrawalCard(withdrawal);
+        });
+}
+
+onAuthStateChanged(auth, (user) => {
+    if (user) {
+        const historyRef = ref(database, `users/${user.uid}/withdrawalHistory`);
+        onValue(historyRef, (snapshot) => {
+            const history = snapshot.val();
+            if (history) {
+                Object.entries(history).forEach(([key, withdrawal]) => {
+                    // Mise à jour en temps réel du statut pour chaque retrait
+                    const withdrawalRef = ref(database, `users/${user.uid}/withdrawalHistory/${key}`);
+                    onValue(withdrawalRef, (withdrawalSnapshot) => {
+                        const updatedWithdrawal = withdrawalSnapshot.val();
+                        if (updatedWithdrawal) {
+                            updateStatus(updatedWithdrawal.timestamp, updatedWithdrawal.status);
+                        }
+                    });
+                });
+            }
+            displayWithdrawalHistory(history);
+        });
+    } else {
+        window.location.href = 'login.html';
+    }
+});
+
+document.querySelector('.back-arrow').addEventListener('click', (e) => {
+    e.preventDefault();
+    history.back();
+});
+    </script>
+</body>
+</html>

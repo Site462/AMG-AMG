@@ -1,0 +1,788 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flotte de Taxis</title>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: #f0f2f5;
+            padding: 2rem;
+            padding-bottom: 100px;
+        }
+
+        .notification {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            padding: 15px 25px;
+            border-radius: 8px;
+            color: white;
+            z-index: 1000;
+            display: none;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        .notification.success {
+            background-color: #22c55e;
+        }
+
+        .notification.error {
+            background-color: #ef4444;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            margin-bottom: 3rem;
+            color: #1e293b;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: #0f172a;
+        }
+
+        .header p {
+            color: #64748b;
+            font-size: 1.1rem;
+        }
+
+        .taxi-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            padding: 1rem;
+        }
+
+        .taxi-card {
+            background: white;
+            border-radius: 20px;
+            overflow: hidden;
+            box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .taxi-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 25px -5px rgb(0 0 0 / 0.1);
+        }
+
+        .taxi-image {
+            height: 200px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .taxi-image img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .taxi-status {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            background: rgba(34, 197, 94, 0.9);
+            color: white;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .taxi-info {
+            padding: 1.5rem;
+        }
+
+        .taxi-title {
+            font-size: 1.5rem;
+            color: #0f172a;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .taxi-price {
+            font-size: 1.25rem;
+            color: #2563eb;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .taxi-price i {
+            font-size: 1.1rem;
+        }
+
+        .taxi-details {
+            margin-bottom: 1rem;
+            padding: 1rem;
+            background: #f8fafc;
+            border-radius: 12px;
+        }
+
+        .taxi-detail-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px dashed #e2e8f0;
+        }
+
+        .taxi-detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: #64748b;
+            font-size: 0.875rem;
+        }
+
+        .detail-value {
+            color: #0f172a;
+            font-weight: 500;
+        }
+
+        .buy-button {
+            background: #22c55e;
+            color: white;
+            padding: 1rem 2rem;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            font-size: 1rem;
+            width: 100%;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            margin-top: 1rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .buy-button:hover {
+            background: #16a34a;
+        }
+
+        .buy-button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+
+        .buy-button i {
+            font-size: 1.1rem;
+        }
+
+        .footer-nav {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            background-color: white;
+            padding: 12px 0;
+            box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+        }
+
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: #6c757d;
+            text-decoration: none;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item.active {
+            color: #4c66c0;
+        }
+
+        .nav-item.active .nav-icon {
+            background-color: #4c66c0;
+            color: white;
+        }
+
+        .nav-icon {
+            width: 46px;
+            height: 46px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 5px;
+            font-size: 20px;
+            background-color: #f2f3f8;
+            color: #6c757d;
+            transition: all 0.3s ease;
+        }
+
+        .nav-item:hover .nav-icon {
+            transform: translateY(-3px);
+            box-shadow: 0 4px 8px rgba(76, 102, 192, 0.3);
+        }
+
+        .nav-item:hover {
+            color: #4c66c0;
+        }
+
+        .nav-label {
+            font-weight: 500;
+        }
+
+        .car-button {
+            position: relative;
+            margin-bottom: 20px;
+        }
+
+        .car-button .nav-icon {
+            background-color: #4c66c0;
+            color: white;
+            width: 62px;
+            height: 62px;
+            margin-top: -40px;
+            box-shadow: 0 4px 10px rgba(76, 102, 192, 0.4);
+            border: 4px solid white;
+        }
+
+        .car-button .nav-label {
+            color: #4c66c0;
+        }
+
+        @media (max-width: 768px) {
+            .taxi-grid {
+                grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+                gap: 1.5rem;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            body {
+                padding: 1rem;
+                padding-bottom: 100px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="notification"></div>
+    
+    <div class="container">
+        <header class="header">
+            <h1>Notre Flotte de Taxis</h1>
+            <p>Découvrez nos véhicules disponibles pour vos courses</p>
+        </header>
+
+        <div class="taxi-grid">
+            <!-- Taxi 1 -->
+            <div class="taxi-card">
+                <div class="taxi-image">
+                    <img src="https://image.noelshack.com/fichiers/2025/08/1/1739784102-16-mercedes-amg-eqs-uk.jpg" alt="Taxi 1">
+                    <div class="taxi-status"></div>
+                </div>
+                <div class="taxi-info">
+                    <h2 class="taxi-title">FTG 1 code 6789</h2>
+                    <div class="taxi-price">
+                        <i class="fas fa-tag"></i>
+                        2 500 FCFA
+                    </div>
+                    <div class="taxi-details">
+                        <div class="taxi-detail-item">
+                            <span class="detail-label">Revenus quotidien</span>
+                            <span class="detail-value"> 200 FCFA</span>
+                        </div>
+                        <div class="taxi-detail-item">
+                            <span class="detail-label">Cycle</span>
+                            <span class="detail-value"> 124 jours</span>
+                        </div>
+                        <div class="taxi-detail-item">
+                            <span class="detail-label">Revenus total</span>
+                            <span class="detail-value"> 24 800 FCFA</span>
+                        </div>
+                        <div class="taxi-detail-item">
+                            <span class="detail-label">Limite d'achat</span>
+                            <span class="detail-value" id="purchaseLimit1">1 achats restants</span>
+                        </div>
+                    </div>
+                    <button class="buy-button" onclick="investProduct(1, 2500)">
+                        <i class="fas fa-shopping-cart"></i>
+                        Acheter
+                    </button>
+                </div>
+            </div>
+
+            <!-- Taxi 2 -->
+            <div class="taxi-card">
+                <div class="taxi-image">
+                    <img src="https://image.noelshack.com/fichiers/2025/08/1/1739783955-f8216e7b-760a-4a38-ac88-f33b4b1543b5.jpg" alt="Taxi 2">
+                    <div class="taxi-status"></div>
+                </div>
+                <div class="taxi-info">
+                    <h2 class="taxi-title">SDR code 213456</h2>
+                    <div class="taxi-price">
+                        <i class="fas fa-tag"></i>
+                        9 000 FCFA
+                    </div>
+                    <div class="taxi-details">
+                        <div class="taxi-detail-item">
+                            <span class="detail-label">Revenus quotidien</span>
+                            <span class="detail-value"> 700 FCFA</span>
+                        </div>
+                        <div class="taxi-detail-item">
+                            <span class="detail-label">Cycle</span>
+                            <span class="detail-value"> 124 jours</span>
+                        </div>
+                        <div class="taxi-detail-item">
+                            <span class="detail-label">Revenus total</span>
+                            <span class="detail-value"> 86 800 FCFA</span>
+                        </div>
+                        <div class="taxi-detail-item">
+                            <span class="detail-label">Limite d'achat</span>
+                            <span class="detail-value" id="purchaseLimit2">2 achats restants</span>
+                        </div>
+                    </div>
+                    <button class="buy-button" onclick="investProduct(2, 9000)">
+                        <i class="fas fa-shopping-cart"></i>
+                        Acheter
+                    </button>
+                </div>
+            </div>
+
+            <!-- Taxi 3 -->
+            <div class="taxi-card">
+                <div class="taxi-image">
+                    <img src="https://image.noelshack.com/fichiers/2025/08/1/1739783835-2020-mercedes-amg-c-63-s-coupe-02-dw.jpg" alt="Taxi 3">
+                    <div class="taxi-status"></div>
+                </div>
+                <div class="taxi-info">
+                    <h2 class="taxi-title">Turbo 2 code 00000</h2>
+                    <div class="taxi-price">
+                        <i class="fas fa-tag"></i>
+                        25 000 FCFA
+                    </div>
+                    <div class="taxi-details">
+                        <div class="taxi-detail-item">
+                            <span class="detail-label">Revenus quotidien</span>
+                            <span class="detail-value">  1 000 FCFA</span>
+                        </div>
+                        <div class="taxi-detail-item">
+                            <span class="detail-label">Cycle</span>
+                            <span class="detail-value"> 124 jours</span>
+                        </div>
+                        <div class="taxi-detail-item">
+                            <span class="detail-label">Revenus total</span>
+                            <span class="detail-value"> 124 000 FCFA</span>
+                        </div>
+                        <div class="taxi-detail-item">
+                            <span class="detail-label">Limite d'achat</span>
+                            <span class="detail-value" id="purchaseLimit2">2 achats restants</span>
+                        </div>
+                    </div>
+                    <button class="buy-button" onclick="investProduct(3, 25000)">
+                        <i class="fas fa-shopping-cart"></i>
+                        Acheter
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Taxi 4 -->
+            <div class="taxi-card">
+                <div class="taxi-image">
+                    <img src="https://image.noelshack.com/fichiers/2025/08/1/1739783117-new-audi-e-tron-gt-2024-7.jpg" alt="Taxi 4">
+                    <div class="taxi-status"></div>
+                </div>
+                <div class="taxi-info">
+                    <h2 class="taxi-title">SZA code 6795</h2>
+                    <div class="taxi-price">
+                        <i class="fas fa-tag"></i>
+                        50 000 FCFA
+                    </div>
+                    <div class="taxi-details">
+                        <div class="taxi-detail-item">
+                            <span class="detail-label">Revenus quotidien</span>
+                            <span class="detail-value">  3 000 FCFA</span>
+                        </div>
+                        <div class="taxi-detail-item">
+                            <span class="detail-label">Cycle</span>
+                            <span class="detail-value"> 124 jours</span>
+                        </div>
+                        <div class="taxi-detail-item">
+                            <span class="detail-label">Revenus total</span>
+                            <span class="detail-value"> 372 000 FCFA</span>
+                        </div>
+                        <div class="taxi-detail-item">
+                            <span class="detail-label">Limite d'achat</span>
+                            <span class="detail-value" id="purchaseLimit2">2 achats restants</span>
+                        </div>
+                    </div>
+                    <button class="buy-button" onclick="investProduct(4, 50000)">
+                        <i class="fas fa-shopping-cart"></i>
+                        Acheter
+                    </button>
+                </div>
+            </div>
+            
+            <!-- Taxi 5 -->
+            <div class="taxi-card">
+                <div class="taxi-image">
+                    <img src="https://image.noelshack.com/fichiers/2025/08/1/1739785582-2025-mercedes-amg-eqs-3-672e66ec82cdc.jpg" alt="Taxi 5">
+                    <div class="taxi-status"></div>
+                </div>
+                <div class="taxi-info">
+                    <h2 class="taxi-title">AAR code 4545</h2>
+                    <div class="taxi-price">
+                        <i class="fas fa-tag"></i>
+                        100 000 FCFA
+                    </div>
+                    <div class="taxi-details">
+                        <div class="taxi-detail-item">
+                            <span class="detail-label">Revenus quotidien</span>
+                            <span class="detail-value">  6 000 FCFA</span>
+                        </div>
+                        <div class="taxi-detail-item">
+                            <span class="detail-label">Cycle</span>
+                            <span class="detail-value"> 124 jours</span>
+                        </div>
+                        <div class="taxi-detail-item">
+                            <span class="detail-label">Revenus total</span>
+                            <span class="detail-value"> 744 000 FCFA</span>
+                        </div>
+                        <div class="taxi-detail-item">
+                            <span class="detail-label">Limite d'achat</span>
+                            <span class="detail-value" id="purchaseLimit2">2 achats restants</span>
+                        </div>
+                    </div>
+                    <button class="buy-button" onclick="investProduct(5, 100000)">
+                        <i class="fas fa-shopping-cart"></i>
+                        Acheter
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Barre de navigation en pied de page -->
+    <div class="footer-nav">
+        <a href="accueil.html" class="nav-item active">
+            <div class="nav-icon">
+                <i class="fas fa-home"></i>
+            </div>
+            <span class="nav-label">Accueil</span>
+        </a>
+        
+        <a href="#" class="nav-item">
+            <div class="nav-icon">
+                <i class="fas fa-car-side"></i>
+            </div>
+            <span class="nav-label">Véhicules</span>
+        </a>
+        
+        <a href="machine.html" class="nav-item car-button">
+            <div class="nav-icon">
+                <i class="fas fa-car"></i>
+            </div>
+            <span class="nav-label">Ma voiture</span>
+        </a>
+        
+        <a href="equipe.html" class="nav-item">
+            <div class="nav-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <span class="nav-label">Team</span>
+        </a>
+        
+        <a href="solde.html" class="nav-item">
+            <div class="nav-icon">
+                <i</antArtifact><i class="fas fa-user"></i>
+            </div>
+            <span class="nav-label">Profil</span>
+        </a>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-auth.js";
+        import { 
+            getDatabase, 
+            ref, 
+            get, 
+            set, 
+            onValue, 
+            update, 
+            push, 
+            serverTimestamp 
+        } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-database.js";
+        import { getStorage } from "https://www.gstatic.com/firebasejs/11.2.0/firebase-storage.js";
+
+        // Configuration Firebase
+        const firebaseConfig = {
+            apiKey: "AIzaSyCRrd86FZDKvROvrliQwDoWzjSF_An6T1g",
+            authDomain: "voiture-13e08.firebaseapp.com",
+            databaseURL: "https://voiture-13e08-default-rtdb.firebaseio.com",
+            projectId: "voiture-13e08",
+            storageBucket: "voiture-13e08.firebasestorage.app",
+            messagingSenderId: "614579163299",
+            appId: "1:614579163299:web:96849a3268525c29aeaf16"
+        };  
+
+        // Initialisation Firebase
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // Variables globales
+        let currentUser = null;
+        let userBalance = 0;
+
+        // Configuration des produits
+        const PRODUCT_CONFIG = {
+            1: {
+                dailyRevenue: 200,
+                cycleDuration: 124,
+                totalRevenue: 24800,
+                price: 2500,
+                limit: 1
+            },
+            2: {
+                dailyRevenue: 700,
+                cycleDuration: 124,
+                totalRevenue: 86800,
+                price: 9000,
+                limit: 2
+            },
+            3: {
+                dailyRevenue: 1000,
+                cycleDuration: 124,
+                totalRevenue: 124000,
+                price: 25000,
+                limit: 2
+            },
+             4: {
+                dailyRevenue: 3000,
+                cycleDuration: 124,
+                totalRevenue: 372000,
+                price: 50000,
+                limit: 2
+            }, 
+            5: {
+                dailyRevenue: 6000,
+                cycleDuration: 124,
+                totalRevenue: 744000,
+                price: 100000,
+                limit: 2
+            }
+        };
+
+        // Système de notification
+        function showNotification(message, type) {
+            const notification = document.querySelector('.notification');
+            if (!notification) return;
+            
+            notification.textContent = message;
+            notification.style.display = 'block';
+            notification.className = `notification ${type}`;
+
+            setTimeout(() => {
+                notification.style.display = 'none';
+            }, 3000);
+        }
+
+        // Fonction de traitement du bonus de parrainage
+        async function processReferralBonus(investmentAmount, userId) {
+            try {
+                const userRef = ref(db, `users/${userId}`);
+                const userSnapshot = await get(userRef);
+                
+                if (!userSnapshot.exists()) return;
+                
+                const userData = userSnapshot.val();
+                if (!userData.referredBy) return;
+
+                const referrerRef = ref(db, `users/${userData.referredBy}`);
+                const referrerSnapshot = await get(referrerRef);
+                
+                if (!referrerSnapshot.exists()) return;
+
+                // Calcul du bonus (5% de l'investissement)
+                const bonusAmount = investmentAmount * 0.05;
+
+                // Mise à jour du solde du parrain
+                const referrerBalance = (referrerSnapshot.val().balance || 0) + bonusAmount;
+                
+                await update(referrerRef, {
+                    balance: referrerBalance
+                });
+
+                // Enregistrement de l'historique du bonus
+                const bonusHistoryRef = ref(db, `referralBonuses/${userData.referredBy}`);
+                await push(bonusHistoryRef, {
+                    fromUser: userId,
+                    amount: bonusAmount,
+                    investmentAmount: investmentAmount,
+                    timestamp: serverTimestamp()
+                });
+            } catch (error) {
+                console.error("Erreur lors du traitement du bonus de parrainage:", error);
+            }
+        }
+
+        // Fonction d'investissement
+        window.investProduct = async function(productId, amount) {
+            if (!currentUser) {
+                showNotification("Veuillez vous connecter pour investir", "error");
+                return;
+            }
+
+            try {
+                const productConfig = PRODUCT_CONFIG[productId];
+                const activeInvestments = await checkActiveInvestments(currentUser.uid, productId);
+                
+                if (activeInvestments >= productConfig.limit) {
+                    showNotification("Vous avez atteint la limite d'achat pour ce produit", "error");
+                    return;
+                }
+
+                if (userBalance < amount) {
+                    showNotification("Solde insuffisant pour cet investissement", "error");
+                    return;
+                }
+
+                const updates = {};
+                updates[`users/${currentUser.uid}/balance`] = userBalance - amount;
+
+                const investmentsRef = ref(db, `investments/${currentUser.uid}`);
+                const newInvestmentRef = push(investmentsRef);
+                const currentDate = new Date();
+                
+                updates[`investments/${currentUser.uid}/${newInvestmentRef.key}`] = {
+                    productId: productId,
+                    amount: amount,
+                    startDate: currentDate.toISOString(),
+                    endDate: new Date(currentDate.getTime() + (productConfig.cycleDuration * 24 * 60 * 60 * 1000)).toISOString(),
+                    status: 'active',
+                    remainingDays: productConfig.cycleDuration,
+                    dailyRevenue: productConfig.dailyRevenue,
+                    totalRevenue: productConfig.totalRevenue,
+                    collectedRevenue: 0,
+                    lastCollection: currentDate.toISOString(),
+                    timestamp: serverTimestamp()
+                };
+
+                await update(ref(db), updates);
+                await processReferralBonus(amount, currentUser.uid);
+
+                userBalance -= amount;
+                await updateInvestmentLimits(currentUser.uid);
+                showNotification("Investissement réussi!", "success");
+
+                setTimeout(() => {
+                    window.location.href = 'machine.html';
+                }, 2000);
+            } catch (error) {
+                console.error("Erreur lors de l'investissement:", error);
+                showNotification("Une erreur est survenue lors de l'investissement", "error");
+            }
+        };
+
+        // Vérification des investissements actifs
+        async function checkActiveInvestments(userId, productId) {
+            try {
+                const investmentsRef = ref(db, `investments/${userId}`);
+                const snapshot = await get(investmentsRef);
+                
+                if (!snapshot.exists()) return 0;
+                
+                let activeCount = 0;
+                Object.values(snapshot.val()).forEach(investment => {
+                    if (investment.productId === productId && 
+                        investment.status === 'active' && 
+                        investment.remainingDays > 0) {
+                        activeCount++;
+                    }
+                });
+                
+                return activeCount;
+            } catch (error) {
+                console.error('Erreur lors de la vérification des investissements:', error);
+                return 0;
+            }
+        }
+
+        // Mise à jour des limites d'investissement
+        async function updateInvestmentLimits(userId) {
+            try {
+                for (const productId in PRODUCT_CONFIG) {
+                    const activeInvestments = await checkActiveInvestments(userId, Number(productId));
+                    const remainingPurchases = PRODUCT_CONFIG[productId].limit - activeInvestments;
+                    const limitSpan = document.getElementById(`purchaseLimit${productId}`);
+                    
+                    if (limitSpan) {
+                        limitSpan.textContent = `${remainingPurchases} achat${remainingPurchases > 1 ? 's' : ''} restant${remainingPurchases > 1 ? 's' : ''}`;
+                    }
+
+                    const investBtn = document.querySelector(`[onclick="investProduct(${productId}, ${PRODUCT_CONFIG[productId].price})"]`);
+                    if (investBtn) {
+                        investBtn.disabled = remainingPurchases <= 0;
+                        if (remainingPurchases <= 0) {
+                            investBtn.textContent = 'Limite atteinte';
+                            investBtn.style.backgroundColor = '#999';
+                        }
+                    }
+                }
+            } catch (error) {
+                console.error('Erreur lors de la mise à jour des limites:', error);
+            }
+        }
+
+        // Gestion de l'état de l'authentification
+        onAuthStateChanged(auth, async (user) => {
+            if (user) {
+                currentUser = user;
+                try {
+                    const userRef = ref(db, `users/${user.uid}`);
+                    onValue(userRef, (snapshot) => {
+                        if (snapshot.exists()) {
+                            userBalance = snapshot.val().balance || 0;
+                            updateInvestmentLimits(user.uid);
+                        }
+                    });
+                } catch (error) {
+                    console.error('Erreur lors du chargement des données utilisateur:', error);
+                    showNotification("Erreur lors du chargement des données", "error");
+                }
+            } else {
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Gestion des erreurs globales
+        window.addEventListener('error', (error) => {
+            console.error('Une erreur est survenue:', error);
+            showNotification('Une erreur inattendue est survenue', 'error');
+        });
+    </script>
+</body>
+</html>
